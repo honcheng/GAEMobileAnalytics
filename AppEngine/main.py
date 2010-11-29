@@ -33,8 +33,8 @@ class QueueRecordAnalytics(webapp.RequestHandler):
 		device_model = self.request.get("device_model")
 		manufacturer = self.request.get("manufacturer")
 		telco = self.request.get("telco")
-		t = self.request.self("t")
-		s = self.request.self("s")
+		t = self.request.get("t")
+		s = self.request.get("s")
 		
 		analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
 		analytics.onApplicationStarted(device_model, manufacturer, telco=telco)
@@ -50,21 +50,27 @@ class RecordAnalytics(webapp.RequestHandler):
 		#self.response.out.write(data + "<br>")
 		
 		data = display.showDailyNewUsers()
+		self.response.out.write("<br><br><b>total number of new users daily</b><br><br>")
 		self.response.out.write(data + "<br>")
 		
 		data = display.showTotalNewUsers()
+		self.response.out.write("<br><br><b>total number of new users</b><br><br>")
 		self.response.out.write(data + "<br>")
 		
 		data = display.showDailySessions()
+		self.response.out.write("<br><br><b>total number of sessions daily</b><br><br>")
 		self.response.out.write(data + "<br>")
 
 		data = display.showDeviceModelDistribution()
+		self.response.out.write("<br><br><br><b>Phone models</b><br><br>")
 		self.response.out.write(data + "<br>")
 		
 		data = display.showDeviceManufacturerDistribution()
+		self.response.out.write("<br><br><br><b>Manufacturers</b><br><br>")
 		self.response.out.write(data + "<br>")
 		
 		data = display.showDeviceOSVersionDistribution()
+		self.response.out.write("<br><br><br><b>OS Versions</b><br><br>")
 		self.response.out.write(data + "<br>")
 		
 	def post(self):
@@ -76,8 +82,8 @@ class RecordAnalytics(webapp.RequestHandler):
 			device_model = self.request.get("device_model")
 			manufacturer = self.request.get("manufacturer")
 			telco = self.request.get("telco")
-			t = self.request.self("t")
-			s = self.request.self("s")
+			t = self.request.get("t")
+			s = self.request.get("s")
 			
 			analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
 			if analytics.allowLogging:
@@ -91,8 +97,8 @@ class QueueRecordAnalyticsEvent(webapp.RequestHandler):
 		app_ver = self.request.get("app_ver")
 		event = self.request.get("event")
 		parameters = self.request.get("parameters")
-		t = self.request.self("t")
-		s = self.request.self("s")
+		t = self.request.get("t")
+		s = self.request.get("s")
 		obj = simplejson.loads(parameters)
 		
 		analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
@@ -112,10 +118,10 @@ class GetAnalyticsChartForEvents(webapp.RequestHandler):
 			height = None
 		
 		if event_name!='' and param_key!='':
-			data = display.showEvents(event_name=event_name, param_key=param_key, width=width, height=height)
+			data = display.showEvents(eventName=event_name, paramKey=param_key, width=width, height=height)
 			self.response.out.write(data)
 		elif event_name!='' and param_key=='':
-			data = display.showEvents(event_name=event_name, width=width, height=height)
+			data = display.showEvents(eventName=event_name, width=width, height=height)
 			self.response.out.write(data)
 		else:
 			data = display.showEvents(width=width, height=height)
@@ -133,8 +139,8 @@ class RecordAnalyticsEvent(webapp.RequestHandler):
 			app_ver = self.request.get("app_ver")
 			event = self.request.get("event")
 			parameters = self.request.get("parameters")
-			t = self.request.self("t")
-			s = self.request.self("s")
+			t = self.request.get("t")
+			s = self.request.get("s")
 			
 			analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
 			if analytics.allowLogging:

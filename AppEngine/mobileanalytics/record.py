@@ -7,14 +7,11 @@ from datastore import Events
 from google.appengine.ext import db
 from django.utils import simplejson
 import datetime
-import pytz 
-from pytz import timezone
 from datetime import date
 from datetime import timedelta
 import config
 import hashlib
 
-sg_tz = timezone('Asia/Singapore') 
 chart_colors = ['FF0000','3072F3','0a8f00','d97b00','c700d9','00d9a3','2f2f2f','0000ff','2aff00','ff00c6','6d6d6d','6d6d6d','6d6d6d','6d6d6d','6d6d6d']
 
 class DisplayAnalytics(object):
@@ -29,7 +26,7 @@ class DisplayAnalytics(object):
 				os_vers[device.os_ver] = 1
 			else:
 				os_vers[device.os_ver] = os_vers[device.os_ver] + 1
-		all_data = "<br><br><br><b>Manufacturers</b><br><br>"
+		all_data = "<br><br><br><b>OS Versions</b><br><br>"
 		
 		chart_api_url = 'http://chart.apis.google.com/chart'
 		chd = ""
@@ -47,6 +44,9 @@ class DisplayAnalytics(object):
 			chco += "%s|" % chart_colors[color_index]
 			color_index += 1
 		data += "</table>"
+		
+		if len(os_vers.keys())==0:
+			return "no data yet"
 
 		if width==None:
 			width = 800
@@ -54,9 +54,9 @@ class DisplayAnalytics(object):
 			height = 300
 
 		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=p'/>" % (chart_api_url, width, height, chd[:-1], chl[:-1])
-		all_data += "<br>%s" % chart_data
+		#all_data += "<br>%s" % chart_data
 	
-		return all_data
+		return chart_data
 	
 	def showDeviceManufacturerDistribution(self, width=None, height=None):
 		devices = db.GqlQuery("SELECT * FROM MobileDevice")
@@ -84,6 +84,9 @@ class DisplayAnalytics(object):
 			chco += "%s|" % chart_colors[color_index]
 			color_index += 1
 		data += "</table>"
+		
+		if len(manufacturers.keys())==0:
+			return "no data yet"
 
 		if width==None:
 			width = 800
@@ -91,9 +94,9 @@ class DisplayAnalytics(object):
 			height = 300
 		
 		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=p'/>" % (chart_api_url, width, height, chd[:-1], chl[:-1])
-		all_data += "<br>%s" % chart_data
+		#all_data += "<br>%s" % chart_data
 	
-		return all_data
+		return chart_data
 	
 	def showDeviceModelDistribution(self, width=None, height=None):
 		devices = db.GqlQuery("SELECT * FROM MobileDevice")
@@ -122,6 +125,9 @@ class DisplayAnalytics(object):
 			color_index += 1
 		data += "</table>"
 		
+		if len(device_models.keys())==0:
+			return "no data yet"
+		
 		if width==None:
 			width = 800
 		if height==None:
@@ -129,11 +135,11 @@ class DisplayAnalytics(object):
 		#chart_data = "<img src='%s?chs=600x300&chd=t:%s&chl=%s&cht=p&chco=%s'/>" % (chart_api_url, chd[:-1], chl[:-1], chco[:-1])
 		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=p'/>" % (chart_api_url, width, height, chd[:-1], chl[:-1])
 		
-		all_data += "<br>%s" % chart_data
+		#all_data += "<br>%s" % chart_data
 		
-		return all_data
+		return chart_data
 	
-	def showEvents(self, event_name=None, param_key=None, width=None, height=None):
+	def showEvents(self, eventName=None, paramKey=None, width=None, height=None):
 		"""
 		records = db.GqlQuery("SELECT * FROM Events ORDER BY event_name, param_key, date, param_value")
 		data = "<table border=1><tr><td>event_name</td><td>key</td><td>value</td><td>total</td><td>date</td><td>os</td><td>os_ver</td><td>app_ver</td><td>duration</td></tr>"
@@ -143,10 +149,10 @@ class DisplayAnalytics(object):
 		data += "</table>"
 		"""
 		
-		if event_name!=None and param_key!=None:
-			events = db.GqlQuery("SELECT * FROM Events WHERE event_name=:event_name AND param_key=:param_key ORDER BY date", event_name=event_name, param_key=param_key)
-		elif event_name!=None and param_key==None:
-			events = db.GqlQuery("SELECT * FROM Events WHERE event_name=:event_name ORDER BY date", event_name=event_name)
+		if eventName!=None and paramKey!=None:
+			events = db.GqlQuery("SELECT * FROM Events WHERE event_name=:event_name AND param_key=:param_key ORDER BY date", event_name=eventName, param_key=paramKey)
+		elif eventName!=None and paramKey==None:
+			events = db.GqlQuery("SELECT * FROM Events WHERE event_name=:event_name ORDER BY date", event_name=eventName)
 		else:
 			events = db.GqlQuery("SELECT * FROM Events ORDER BY date")
 		
@@ -207,27 +213,38 @@ class DisplayAnalytics(object):
 					for record in records:
 						date_str = record.date.strftime('%d %b')
 						if last_date_str!=date_str:
-
+							date_str2 = last_date_str.split(' ')[0]
+							if date_str2=='1' or chl=='':
+								date_str2 = last_date_str
+								
 							data += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (record.event_name, record.param_key, record.param_value, last_total, last_date_str)
 							#chd += "%s," % last_total
 							y_values.append(last_total)
 							if count2==0:
-								chl += "%s|" % last_date_str
+								chl += "%s|" % date_str2
 							last_total = 0
 							
 							new_date = last_date + datetime.timedelta(days=1)
 							new_date_str = new_date.strftime('%d %b')
 							while new_date_str!=date_str:
+								date_str2 = new_date_str.split(' ')[0]
+								if date_str2=='1' or chl=='':
+									date_str2 = new_date_str
+									
 								data += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (record.event_name, record.param_key, record.param_value, last_total, new_date_str)
 								#chd += "%s," % last_total
 								y_values.append(last_total)
 								if count2==0:
-									chl += "%s|" % new_date_str
+									chl += "%s|" % date_str2
 								new_date = new_date + datetime.timedelta(days=1)
 								new_date_str = new_date.strftime('%d %b')
 							
 						last_total += record.total
 						if count==records.count()-1:
+							date_str2 = date_str.split(' ')[0]
+							if date_str2=='1':
+								date_str2 = date_str
+							
 							data += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (record.event_name, record.param_key, record.param_value, last_total, date_str)
 							#chd += "%s" % last_total
 							y_values.append(last_total)
@@ -271,7 +288,8 @@ class DisplayAnalytics(object):
 					height = 300	
 					
 				chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chco=%s&chxt=y&chxr=0,0,%s&chdl=%s'/>" % (chart_api_url, width, height, chd, chl, chco[:-1], max_y, chdl)
-				all_data += "<br><br><br><b>Event: %s - %s</b><br><br>" %  (event_name, param_key)
+				if eventName==None and paramKey==None:
+					all_data += "<br><br><br><b>Event: %s - %s</b><br><br>" %  (event_name, param_key)
 				all_data += chart_data
 				#all_data += "<table><tr><td>%s</td><td>%s</td></tr></table>" % (chart_data, data)
 		
@@ -290,24 +308,35 @@ class DisplayAnalytics(object):
 		cumulative_total = 0
 		y_values = []
 		for record in records:
-			date_str = record.date.strftime('%d %b')
+			date_str = record.date.strftime('%d %b')		
 			if last_date!=date_str and count!=0:
+				date_str2 = last_date.split(' ')[0]
+				if date_str2=='1' or chl=='':
+					date_str2 = last_date
+					
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (last_date, last_total)
 				#chd += "%s," % last_total
 				cumulative_total += last_total
 				y_values.append(cumulative_total)
-				chl += "%s|" % last_date
+				chl += "%s|" % date_str2
 				last_total = 0
 			last_total += record.total
 			if count==records.count()-1:
+				date_str2 = date_str.split(' ')[0]
+				if date_str2=='1':
+					date_str2 = date_str
+				
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (date_str, last_total)
 				#chd += "%s" % last_total
 				cumulative_total += last_total
 				y_values.append(cumulative_total)
-				chl += "%s" % date_str
+				chl += "%s" % date_str2
 			last_date = date_str
 			count += 1	
 		data += "</table>"
+		
+		if len(y_values)==0:
+			return "no data yet"
 		
 		max_y = max(y_values)
 		for i in range(0,len(y_values)):
@@ -321,10 +350,10 @@ class DisplayAnalytics(object):
 			height = 300
 		
 		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chxt=y&chxr=0,0,%s&chm=A%s,666666,0,%s,20'/>" % (chart_api_url, width, height, chd, chl, max_y, max_y,len(y_values)-1)
-		all_data = "<br><br><b></>total number of new users<br><br>"
-		all_data += chart_data
+		#all_data = "<br><br><b>total number of new users</b><br><br>"
+		#all_data += chart_data
 		
-		return all_data
+		return chart_data
 		
 	
 	def showDailyNewUsers(self, width=None, height=None):
@@ -343,21 +372,32 @@ class DisplayAnalytics(object):
 		for record in records:
 			date_str = record.date.strftime('%d %b')
 			if last_date!=date_str and count!=0:
+				date_str2 = last_date.split(' ')[0]
+				if date_str2=='1' or chl=='':
+					date_str2 = last_date
+					
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (last_date, last_total)
 				#chd += "%s," % last_total
 				y_values.append(last_total)
-				chl += "%s|" % last_date
+				chl += "%s|" % date_str2
 				last_total = 0
 			last_total += record.total
 			if count==records.count()-1:
+				date_str2 = date_str.split(' ')[0]
+				if date_str2=='1':
+					date_str2 = date_str
+				
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (date_str, last_total)
 				#chd += "%s" % last_total
 				y_values.append(last_total)
-				chl += "%s" % date_str
+				chl += "%s" % date_str2
 			last_date = date_str
 			count += 1	
 		data += "</table>"
 		
+		if len(y_values)==0:
+			return "no data yet"
+			
 		max_y = max(y_values)
 		for i in range(0,len(y_values)):
 			chd += "%s" % int(y_values[i]/float(max_y)*100)
@@ -370,10 +410,10 @@ class DisplayAnalytics(object):
 			height = 300
 		
 		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chxt=y&chxr=0,0,%s'/>" % (chart_api_url, width, height, chd, chl, max_y)
-		all_data = "<br><br><b></>total number of new users daily<br><br>"
-		all_data += chart_data
+		#all_data = "<br><br><b></>total number of new users daily<br><br>"
+		#all_data += chart_data
 		#all_data += "<table><tr><td>%s</td><td>%s</td></tr></table>" % (chart_data, data)
-		return all_data
+		return chart_data
 
 	
 	def showDailySessions(self, width=None, height=None):
@@ -391,17 +431,25 @@ class DisplayAnalytics(object):
 		for record in records:
 			date_str = record.date.strftime('%d %b')
 			if last_date!=date_str and count!=0:
+				date_str2 = last_date.split(' ')[0]
+				if date_str2=='1' or chl=='':
+					date_str2 = last_date
+					
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (last_date, last_total)
 				#chd += "%s," % last_total
 				y_values.append(last_total)
-				chl += "%s|" % last_date
+				chl += "%s|" % date_str2
 				last_total = 0
 			last_total += record.total
 			if count==records.count()-1:
+				date_str2 = date_str.split(' ')[0]
+				if date_str2=='1':
+					date_str2 = date_str
+					
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (date_str, last_total)
 				#chd += "%s" % last_total
 				y_values.append(last_total)
-				chl += "%s" % date_str
+				chl += "%s" % date_str2
 			last_date = date_str
 			count += 1	
 		data += "</table>"
@@ -410,6 +458,10 @@ class DisplayAnalytics(object):
 		#for record in records:
 		#	data += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (record.total, record.date, record.os, record.os_ver, record.app_ver, record.duration)
 		#data += "</table>"
+		
+		if len(y_values)==0:
+			return "no data yet"
+		
 		max_y = max(y_values)
 		for i in range(0,len(y_values)):
 			chd += "%s" % int(y_values[i]/float(max_y)*100)
@@ -423,11 +475,11 @@ class DisplayAnalytics(object):
 		
 		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chxt=y&chxr=0,0,%s'/>" % (chart_api_url, width, height, chd, chl, max_y)
 		
-		all_data = "<br><br><b></>total number of sessions daily<br><br>"
-		all_data += chart_data
+		#all_data = "<br><br><b><b>total number of sessions daily</b><br><br>"
+		#all_data += chart_data
 		#all_data += "<table><tr><td>%s</td><td>%s</td></tr></table>" % (chart_data, data)
 	
-		return all_data
+		return chart_data
 	
 	def showMobileDevices(self):
 		records = db.GqlQuery("SELECT * FROM MobileDevice")
