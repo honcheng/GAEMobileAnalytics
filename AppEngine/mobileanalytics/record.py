@@ -190,6 +190,7 @@ class DisplayAnalytics(object):
 				chart_api_url = 'http://chart.apis.google.com/chart'
 				chd = ""
 				chl = ""
+				chl_list = []
 				chco =""
 				chdl = ""
 				data = "<br><br><table border=1><tr><td>event_name</td><td>key</td><td>value</td><td>total</td><td>date</td></tr>"
@@ -213,43 +214,45 @@ class DisplayAnalytics(object):
 					for record in records:
 						date_str = record.date.strftime('%d %b')
 						if last_date_str!=date_str:
-							date_str2 = last_date_str.split(' ')[0]
-							if date_str2=='1' or chl=='':
+							date_str2 = last_date_str #.split(' ')[0]
+							#if date_str2=='1' or chl=='':
+							if len(chl_list)==0:
 								date_str2 = last_date_str
 								
 							data += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (record.event_name, record.param_key, record.param_value, last_total, last_date_str)
 							#chd += "%s," % last_total
 							y_values.append(last_total)
 							if count2==0:
-								chl += "%s|" % date_str2
+								chl_list.append(date_str2) #chl += "%s|" % date_str2
 							last_total = 0
 							
 							new_date = last_date + datetime.timedelta(days=1)
 							new_date_str = new_date.strftime('%d %b')
 							while new_date_str!=date_str:
-								date_str2 = new_date_str.split(' ')[0]
-								if date_str2=='1' or chl=='':
+								date_str2 = new_date_str #.split(' ')[0]
+								#if date_str2=='1' or chl=='':
+								if len(chl_list)==0:
 									date_str2 = new_date_str
 									
 								data += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (record.event_name, record.param_key, record.param_value, last_total, new_date_str)
 								#chd += "%s," % last_total
 								y_values.append(last_total)
 								if count2==0:
-									chl += "%s|" % date_str2
+									chl_list.append(date_str2) #chl += "%s|" % date_str2
 								new_date = new_date + datetime.timedelta(days=1)
 								new_date_str = new_date.strftime('%d %b')
 							
 						last_total += record.total
 						if count==records.count()-1:
-							date_str2 = date_str.split(' ')[0]
-							if date_str2=='1':
-								date_str2 = date_str
+							date_str2 = date_str #.split(' ')[0]
+							#if date_str2=='1':
+							#	date_str2 = date_str
 							
 							data += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (record.event_name, record.param_key, record.param_value, last_total, date_str)
 							#chd += "%s" % last_total
 							y_values.append(last_total)
 							if count2==0:
-								chl += "%s" % date_str
+								chl_list.append(date_str) #chl += "%s" % date_str
 						last_date_str = date_str
 						last_date = record.date
 						count += 1
@@ -285,7 +288,19 @@ class DisplayAnalytics(object):
 				if width==None:
 					width = 800
 				if height==None:
-					height = 300	
+					height = 300
+					
+				# assume each label fits into 50 pixel
+				n_label = int(width)/50
+				n_skip = 1
+				while len(chl_list)/n_skip > n_label:
+					n_skip += 1
+
+				for i in range(0, len(chl_list)):
+					if i%n_skip==0:
+						chl += chl_list[i]
+					if i!=len(chl_list)-1:
+						chl += "|"	
 					
 				chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chco=%s&chxt=y&chxr=0,0,%s&chdl=%s'/>" % (chart_api_url, width, height, chd, chl, chco[:-1], max_y, chdl)
 				if eventName==None and paramKey==None:
@@ -300,6 +315,7 @@ class DisplayAnalytics(object):
 		chart_api_url = 'http://chart.apis.google.com/chart'
 		chd = ""
 		chl = ""
+		chl_list = []
 		
 		data = "<table border=1><tr><td>date</td><td>total</td></tr>"
 		last_date = ""
@@ -310,27 +326,28 @@ class DisplayAnalytics(object):
 		for record in records:
 			date_str = record.date.strftime('%d %b')		
 			if last_date!=date_str and count!=0:
-				date_str2 = last_date.split(' ')[0]
-				if date_str2=='1' or chl=='':
+				date_str2 = last_date #.split(' ')[0]
+				#if date_str2=='1' or chl=='':
+				if len(chl_list)==0:
 					date_str2 = last_date
 					
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (last_date, last_total)
 				#chd += "%s," % last_total
 				cumulative_total += last_total
 				y_values.append(cumulative_total)
-				chl += "%s|" % date_str2
+				chl_list.append(date_str2) #chl += "%s|" % date_str2
 				last_total = 0
 			last_total += record.total
 			if count==records.count()-1:
-				date_str2 = date_str.split(' ')[0]
-				if date_str2=='1':
-					date_str2 = date_str
+				date_str2 = date_str #.split(' ')[0]
+				#if date_str2=='1':
+				#	date_str2 = date_str
 				
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (date_str, last_total)
 				#chd += "%s" % last_total
 				cumulative_total += last_total
 				y_values.append(cumulative_total)
-				chl += "%s" % date_str2
+				chl_list.append(date_str2) #chl += "%s" % date_str2
 			last_date = date_str
 			count += 1	
 		data += "</table>"
@@ -348,6 +365,18 @@ class DisplayAnalytics(object):
 			width = 800
 		if height==None:
 			height = 300
+
+		# assume each label fits into 50 pixel
+		n_label = int(width)/50
+		n_skip = 1
+		while len(chl_list)/n_skip > n_label:
+			n_skip += 1
+		
+		for i in range(0, len(chl_list)):
+			if i%n_skip==0:
+				chl += chl_list[i]
+			if i!=len(chl_list)-1:
+				chl += "|"
 		
 		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chxt=y&chxr=0,0,%s&chm=A%s,666666,0,%s,20'/>" % (chart_api_url, width, height, chd, chl, max_y, max_y,len(y_values)-1)
 		#all_data = "<br><br><b>total number of new users</b><br><br>"
@@ -363,6 +392,7 @@ class DisplayAnalytics(object):
 		chart_api_url = 'http://chart.apis.google.com/chart'
 		chd = ""
 		chl = ""
+		chl_list = []
 		
 		data = "<table border=1><tr><td>date</td><td>total</td></tr>"
 		last_date = ""
@@ -372,25 +402,21 @@ class DisplayAnalytics(object):
 		for record in records:
 			date_str = record.date.strftime('%d %b')
 			if last_date!=date_str and count!=0:
-				date_str2 = last_date.split(' ')[0]
-				if date_str2=='1' or chl=='':
+				date_str2 = last_date
+				if len(chl_list)==0:
 					date_str2 = last_date
 					
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (last_date, last_total)
-				#chd += "%s," % last_total
 				y_values.append(last_total)
-				chl += "%s|" % date_str2
+				chl_list.append(date_str2)
 				last_total = 0
 			last_total += record.total
 			if count==records.count()-1:
-				date_str2 = date_str.split(' ')[0]
-				if date_str2=='1':
-					date_str2 = date_str
+				date_str2 = date_str 
 				
 				data += "<tr><td>%s</td><td>%s</td></tr>" % (date_str, last_total)
-				#chd += "%s" % last_total
 				y_values.append(last_total)
-				chl += "%s" % date_str2
+				chl_list.append(date_str2)
 			last_date = date_str
 			count += 1	
 		data += "</table>"
@@ -408,6 +434,18 @@ class DisplayAnalytics(object):
 			width = 800
 		if height==None:
 			height = 300
+		
+		# assume each label fits into 50 pixel
+		n_label = int(width)/50
+		n_skip = 1
+		while len(chl_list)/n_skip > n_label:
+			n_skip += 1
+		
+		for i in range(0, len(chl_list)):
+			if i%n_skip==0:
+				chl += chl_list[i]
+			if i!=len(chl_list)-1:
+				chl += "|"
 		
 		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chxt=y&chxr=0,0,%s'/>" % (chart_api_url, width, height, chd, chl, max_y)
 		#all_data = "<br><br><b></>total number of new users daily<br><br>"
@@ -629,5 +667,4 @@ class RecordAnalytics(object):
 		else:
 			actual_secret_key = self.getSecretKey(config.gaemobileanalytics_api_key, self.time)
 			return actual_secret_key==self.secret_key
-		
 		
