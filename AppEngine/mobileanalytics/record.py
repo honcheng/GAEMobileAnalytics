@@ -1,3 +1,36 @@
+#
+#  Copyright (c) 2010 Muh Hon Cheng
+#  Created by honcheng on 11/29/10.
+#  
+#  Permission is hereby granted, free of charge, to any person obtaining 
+#  a copy of this software and associated documentation files (the 
+#  "Software"), to deal in the Software without restriction, including 
+#  without limitation the rights to use, copy, modify, merge, publish, 
+#  distribute, sublicense, and/or sell copies of the Software, and to 
+#  permit persons to whom the Software is furnished to do so, subject 
+#  to the following conditions:
+#  
+#  The above copyright notice and this permission notice shall be 
+#  included in all copies or substantial portions of the Software.
+#  
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT 
+#  WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+#  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+#  PURPOSE AND NONINFRINGEMENT. IN NO EVENT 
+#  SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+#  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
+#  IN CONNECTION WITH THE SOFTWARE OR 
+#  THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#  
+#  @author 		Muh Hon Cheng <honcheng@gmail.com>
+#  @copyright	2010	Muh Hon Cheng
+#  @version     0.1
+#  
+#
+
 from datastore import MobileDevice
 from datastore import DailyMobileDeviceAccess
 from datastore import DailyNewUsers
@@ -17,7 +50,7 @@ chart_colors = ['FF0000','3072F3','0a8f00','d97b00','c700d9','00d9a3','2f2f2f','
 class DisplayAnalytics(object):
 	def __init__(self):
 		pass
-	
+
 	def showDeviceOSVersionDistribution(self, width=None, height=None):
 		devices = db.GqlQuery("SELECT * FROM MobileDevice")
 		os_vers = {}
@@ -138,6 +171,42 @@ class DisplayAnalytics(object):
 		#all_data += "<br>%s" % chart_data
 		
 		return chart_data
+	
+	def getLineChartURL(self, x_values, y_values, chart_width, chart_height, other_parameters=None):
+		
+		chd = ''
+		chl = ''
+		
+		if chart_width==None:
+			chart_width = 800
+		if chart_height==None:
+			chart_height = 300
+
+		# assume each label fits into 50 pixel
+		n_label = int(chart_width)/50
+		n_skip = 1
+		while len(x_values)/n_skip > n_label:
+			n_skip += 1
+		
+		for i in range(0, len(x_values)):
+			if i%n_skip==0:
+				chl += x_values[i]
+			if i!=len(x_values)-1:
+				chl += "|"
+		
+		max_y = max(y_values)
+		for i in range(0,len(y_values)):
+			chd += '%s' % int(y_values[i]/float(max_y)*100)
+			if i!=len(y_values)-1:
+				chd += ","
+			
+		chart_api_url = 'http://chart.apis.google.com/chart'	
+		chart_url = '%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chxt=y&chxr=0,0,%s' % (chart_api_url, chart_width, chart_height, chd, chl, max_y)
+		if other_parameters!=None:
+			for key in other_parameters.keys():
+				chart_url += "&%s=%s" % (key, other_parameters[key])
+		
+		return chart_url
 	
 	def showEvents(self, eventName=None, paramKey=None, width=None, height=None):
 		"""
@@ -303,6 +372,9 @@ class DisplayAnalytics(object):
 						chl += "|"	
 					
 				chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chco=%s&chxt=y&chxr=0,0,%s&chdl=%s'/>" % (chart_api_url, width, height, chd, chl, chco[:-1], max_y, chdl)
+				#chart_url = self.getLineChartURL(chl_list, y_values, width, height)
+				#chart_data = "<img src='%s'/>" % chart_url
+				
 				if eventName==None and paramKey==None:
 					all_data += "<br><br><br><b>Event: %s - %s</b><br><br>" %  (event_name, param_key)
 				all_data += chart_data
@@ -312,12 +384,8 @@ class DisplayAnalytics(object):
 	
 	def showTotalNewUsers(self, width=None, height=None):
 		records = db.GqlQuery("SELECT * FROM DailyNewUsers ORDER BY date")
-		chart_api_url = 'http://chart.apis.google.com/chart'
-		chd = ""
-		chl = ""
-		chl_list = []
 		
-		data = "<table border=1><tr><td>date</td><td>total</td></tr>"
+		chl_list = []
 		last_date = ""
 		last_total = 0
 		count = 0
@@ -326,78 +394,72 @@ class DisplayAnalytics(object):
 		for record in records:
 			date_str = record.date.strftime('%d %b')		
 			if last_date!=date_str and count!=0:
-				date_str2 = last_date #.split(' ')[0]
-				#if date_str2=='1' or chl=='':
+				date_str2 = last_date 
 				if len(chl_list)==0:
 					date_str2 = last_date
-					
-				data += "<tr><td>%s</td><td>%s</td></tr>" % (last_date, last_total)
-				#chd += "%s," % last_total
 				cumulative_total += last_total
 				y_values.append(cumulative_total)
-				chl_list.append(date_str2) #chl += "%s|" % date_str2
+				chl_list.append(date_str2) 
 				last_total = 0
 			last_total += record.total
 			if count==records.count()-1:
-				date_str2 = date_str #.split(' ')[0]
-				#if date_str2=='1':
-				#	date_str2 = date_str
-				
-				data += "<tr><td>%s</td><td>%s</td></tr>" % (date_str, last_total)
-				#chd += "%s" % last_total
+				date_str2 = date_str
 				cumulative_total += last_total
 				y_values.append(cumulative_total)
-				chl_list.append(date_str2) #chl += "%s" % date_str2
+				chl_list.append(date_str2)
 			last_date = date_str
 			count += 1	
-		data += "</table>"
+
+		if len(y_values)==0:
+			return "no data yet"
+	
+		chart_parameters = {}
+		chart_parameters['chm'] = 'A%s,666666,0,%s,20' % (max(y_values),len(y_values)-1)
+		
+		chart_url = self.getLineChartURL(chl_list, y_values, width, height, other_parameters=chart_parameters)
+		chart_data = "<img src='%s'/>" % chart_url
+		return chart_data
+		
+	def showDailyNewUsers(self, width=None, height=None):
+		records = db.GqlQuery("SELECT * FROM DailyNewUsers ORDER BY date")
+
+		chl_list = []
+		last_date = ""
+		last_total = 0
+		count = 0
+		y_values = []
+		
+		for record in records:
+			date_str = record.date.strftime('%d %b')
+			if last_date!=date_str and count!=0:
+				date_str2 = last_date
+				if len(chl_list)==0:
+					date_str2 = last_date
+				y_values.append(last_total)
+				chl_list.append(date_str2)
+				last_total = 0
+			last_total += record.total
+			if count==records.count()-1:
+				date_str2 = date_str 
+				y_values.append(last_total)
+				chl_list.append(date_str2)
+			last_date = date_str
+			count += 1	
 		
 		if len(y_values)==0:
 			return "no data yet"
 		
-		max_y = max(y_values)
-		for i in range(0,len(y_values)):
-			chd += "%s" % int(y_values[i]/float(max_y)*100)
-			if i!=len(y_values)-1:
-				chd += ","
-		
-		if width==None:
-			width = 800
-		if height==None:
-			height = 300
-
-		# assume each label fits into 50 pixel
-		n_label = int(width)/50
-		n_skip = 1
-		while len(chl_list)/n_skip > n_label:
-			n_skip += 1
-		
-		for i in range(0, len(chl_list)):
-			if i%n_skip==0:
-				chl += chl_list[i]
-			if i!=len(chl_list)-1:
-				chl += "|"
-		
-		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chxt=y&chxr=0,0,%s&chm=A%s,666666,0,%s,20'/>" % (chart_api_url, width, height, chd, chl, max_y, max_y,len(y_values)-1)
-		#all_data = "<br><br><b>total number of new users</b><br><br>"
-		#all_data += chart_data
-		
+		chart_url = self.getLineChartURL(chl_list, y_values, width, height)
+		chart_data = "<img src='%s'/>" % chart_url
 		return chart_data
-		
-	
-	def showDailyNewUsers(self, width=None, height=None):
-		records = db.GqlQuery("SELECT * FROM DailyNewUsers ORDER BY date")
-		#data = "<table border=1><tr><td>total</td><td>date</td><td>os</td><td>os_ver</td><td>app_ver</td></tr>"
-		
-		chart_api_url = 'http://chart.apis.google.com/chart'
-		chd = ""
-		chl = ""
-		chl_list = []
-		
-		data = "<table border=1><tr><td>date</td><td>total</td></tr>"
+
+	def showDailySessions(self, width=None, height=None):
+		records = db.GqlQuery("SELECT * FROM DailySessions ORDER BY date")
 		last_date = ""
 		last_total = 0
 		count = 0
+		chl_list = []
+		
 		y_values = []
 		for record in records:
 			date_str = record.date.strftime('%d %b')
@@ -406,116 +468,22 @@ class DisplayAnalytics(object):
 				if len(chl_list)==0:
 					date_str2 = last_date
 					
-				data += "<tr><td>%s</td><td>%s</td></tr>" % (last_date, last_total)
 				y_values.append(last_total)
 				chl_list.append(date_str2)
 				last_total = 0
 			last_total += record.total
 			if count==records.count()-1:
 				date_str2 = date_str 
-				
-				data += "<tr><td>%s</td><td>%s</td></tr>" % (date_str, last_total)
 				y_values.append(last_total)
-				chl_list.append(date_str2)
+				chl_list.append(date_str2) 
 			last_date = date_str
 			count += 1	
-		data += "</table>"
-		
-		if len(y_values)==0:
-			return "no data yet"
-			
-		max_y = max(y_values)
-		for i in range(0,len(y_values)):
-			chd += "%s" % int(y_values[i]/float(max_y)*100)
-			if i!=len(y_values)-1:
-				chd += ","
-
-		if width==None:
-			width = 800
-		if height==None:
-			height = 300
-		
-		# assume each label fits into 50 pixel
-		n_label = int(width)/50
-		n_skip = 1
-		while len(chl_list)/n_skip > n_label:
-			n_skip += 1
-		
-		for i in range(0, len(chl_list)):
-			if i%n_skip==0:
-				chl += chl_list[i]
-			if i!=len(chl_list)-1:
-				chl += "|"
-		
-		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chxt=y&chxr=0,0,%s'/>" % (chart_api_url, width, height, chd, chl, max_y)
-		#all_data = "<br><br><b></>total number of new users daily<br><br>"
-		#all_data += chart_data
-		#all_data += "<table><tr><td>%s</td><td>%s</td></tr></table>" % (chart_data, data)
-		return chart_data
-
-	
-	def showDailySessions(self, width=None, height=None):
-		records = db.GqlQuery("SELECT * FROM DailySessions ORDER BY date")
-		
-		chart_api_url = 'http://chart.apis.google.com/chart'
-		chd = ""
-		chl = ""
-		data = "<table border=1><tr><td>date</td><td>total</td></tr>"
-		last_date = ""
-		last_total = 0
-		count = 0
-		
-		y_values = []
-		for record in records:
-			date_str = record.date.strftime('%d %b')
-			if last_date!=date_str and count!=0:
-				date_str2 = last_date.split(' ')[0]
-				if date_str2=='1' or chl=='':
-					date_str2 = last_date
-					
-				data += "<tr><td>%s</td><td>%s</td></tr>" % (last_date, last_total)
-				#chd += "%s," % last_total
-				y_values.append(last_total)
-				chl += "%s|" % date_str2
-				last_total = 0
-			last_total += record.total
-			if count==records.count()-1:
-				date_str2 = date_str.split(' ')[0]
-				if date_str2=='1':
-					date_str2 = date_str
-					
-				data += "<tr><td>%s</td><td>%s</td></tr>" % (date_str, last_total)
-				#chd += "%s" % last_total
-				y_values.append(last_total)
-				chl += "%s" % date_str2
-			last_date = date_str
-			count += 1	
-		data += "</table>"
-		
-		#data = "<table border=1><tr><td>total</td><td>date</td><td>os</td><td>os_ver</td><td>app_ver</td><td>duration</td></tr>"
-		#for record in records:
-		#	data += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (record.total, record.date, record.os, record.os_ver, record.app_ver, record.duration)
-		#data += "</table>"
 		
 		if len(y_values)==0:
 			return "no data yet"
 		
-		max_y = max(y_values)
-		for i in range(0,len(y_values)):
-			chd += "%s" % int(y_values[i]/float(max_y)*100)
-			if i!=len(y_values)-1:
-				chd += ","
-				
-		if width==None:
-			width = 800
-		if height==None:
-			height = 300
-		
-		chart_data = "<img src='%s?chs=%sx%s&chd=t:%s&chl=%s&cht=lc&chxt=y&chxr=0,0,%s'/>" % (chart_api_url, width, height, chd, chl, max_y)
-		
-		#all_data = "<br><br><b><b>total number of sessions daily</b><br><br>"
-		#all_data += chart_data
-		#all_data += "<table><tr><td>%s</td><td>%s</td></tr></table>" % (chart_data, data)
+		chart_url = self.getLineChartURL(chl_list, y_values, width, height)
+		chart_data = "<img src='%s'/>" % chart_url
 	
 		return chart_data
 	
