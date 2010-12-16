@@ -1,0 +1,225 @@
+// !$*UTF8*$!
+{
+	1D3623240D0F684500981E51 /* gaemobileanalyticsAppDelegate.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {657, 572}}";
+			sepNavSelRange = "{1290, 0}";
+			sepNavVisRange = "{962, 522}";
+		};
+	};
+	1D3623250D0F684500981E51 /* gaemobileanalyticsAppDelegate.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {810, 1495}}";
+			sepNavSelRange = "{1290, 0}";
+			sepNavVisRange = "{916, 539}";
+		};
+	};
+	1D6058900D05DD3D006BFB54 /* gaemobileanalytics */ = {
+		activeExec = 0;
+		executables = (
+			F8A710AF12B9AE3900E16B82 /* gaemobileanalytics */,
+		);
+	};
+	29B97313FDCFA39411CA2CEA /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = F8A710AF12B9AE3900E16B82 /* gaemobileanalytics */;
+		activeTarget = 1D6058900D05DD3D006BFB54 /* gaemobileanalytics */;
+		addToTargets = (
+			1D6058900D05DD3D006BFB54 /* gaemobileanalytics */,
+		);
+		codeSenseManager = F8A710BF12B9AE3C00E16B82 /* Code sense */;
+		executables = (
+			F8A710AF12B9AE3900E16B82 /* gaemobileanalytics */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					479,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 314159020;
+			PBXWorkspaceStateSaveDate = 314159020;
+		};
+		perUserProjectItems = {
+			F8A710C612B9AF8C00E16B82 /* PBXTextBookmark */ = F8A710C612B9AF8C00E16B82 /* PBXTextBookmark */;
+			F8A710DD12B9AFE300E16B82 /* PBXTextBookmark */ = F8A710DD12B9AFE300E16B82 /* PBXTextBookmark */;
+			F8A710DE12B9AFE300E16B82 /* PBXTextBookmark */ = F8A710DE12B9AFE300E16B82 /* PBXTextBookmark */;
+			F8A710DF12B9AFE300E16B82 /* PBXTextBookmark */ = F8A710DF12B9AFE300E16B82 /* PBXTextBookmark */;
+			F8A710E012B9AFE300E16B82 /* PBXTextBookmark */ = F8A710E012B9AFE300E16B82 /* PBXTextBookmark */;
+			F8A710E112B9AFE300E16B82 /* PBXTextBookmark */ = F8A710E112B9AFE300E16B82 /* PBXTextBookmark */;
+			F8A710E212B9AFE300E16B82 /* PBXBookmark */ = F8A710E212B9AFE300E16B82 /* PBXBookmark */;
+			F8A710E312B9AFE300E16B82 /* PBXTextBookmark */ = F8A710E312B9AFE300E16B82 /* PBXTextBookmark */;
+		};
+		sourceControlManager = F8A710BE12B9AE3C00E16B82 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	29B97316FDCFA39411CA2CEA /* main.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {657, 298}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 360}";
+		};
+	};
+	32CA4F630368D1EE00C91783 /* gaemobileanalytics_Prefix.pch */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {768, 298}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 205}";
+		};
+	};
+	F8A710AF12B9AE3900E16B82 /* gaemobileanalytics */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = gaemobileanalytics;
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+	};
+	F8A710BE12B9AE3C00E16B82 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	F8A710BF12B9AE3C00E16B82 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	F8A710C312B9AEA100E16B82 /* GAEMobileAnalytics.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {657, 572}}";
+			sepNavSelRange = "{0, 1290}";
+			sepNavVisRange = "{0, 1054}";
+		};
+	};
+	F8A710C412B9AEA100E16B82 /* GAEMobileAnalytics.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {810, 676}}";
+			sepNavSelRange = "{1290, 0}";
+			sepNavVisRange = "{1101, 463}";
+		};
+	};
+	F8A710C612B9AF8C00E16B82 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F8A710C712B9AF8C00E16B82 /* FlurryAPI.h */;
+		name = "FlurryAPI.h: 2";
+		rLen = 9;
+		rLoc = 7;
+		rType = 0;
+		vrLen = 554;
+		vrLoc = 0;
+	};
+	F8A710C712B9AF8C00E16B82 /* FlurryAPI.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = FlurryAPI.h;
+		path = /Users/honcheng/iphone/coding/myOfficialAppWithSVN/StraitsTimes/STMobileV3/Classes/FlurryLib/FlurryAPI.h;
+		sourceTree = "<absolute>";
+	};
+	F8A710DD12B9AFE300E16B82 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F8A710C312B9AEA100E16B82 /* GAEMobileAnalytics.h */;
+		name = "GAEMobileAnalytics.h: 1";
+		rLen = 1290;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1054;
+		vrLoc = 0;
+	};
+	F8A710DE12B9AFE300E16B82 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F8A710C412B9AEA100E16B82 /* GAEMobileAnalytics.m */;
+		name = "GAEMobileAnalytics.m: 32";
+		rLen = 0;
+		rLoc = 1290;
+		rType = 0;
+		vrLen = 463;
+		vrLoc = 1101;
+	};
+	F8A710DF12B9AFE300E16B82 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 1D3623250D0F684500981E51 /* gaemobileanalyticsAppDelegate.m */;
+		name = "gaemobileanalyticsAppDelegate.m: 32";
+		rLen = 0;
+		rLoc = 1290;
+		rType = 0;
+		vrLen = 539;
+		vrLoc = 916;
+	};
+	F8A710E012B9AFE300E16B82 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 1D3623240D0F684500981E51 /* gaemobileanalyticsAppDelegate.h */;
+		name = "gaemobileanalyticsAppDelegate.h: 32";
+		rLen = 0;
+		rLoc = 1290;
+		rType = 0;
+		vrLen = 522;
+		vrLoc = 962;
+	};
+	F8A710E112B9AFE300E16B82 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 32CA4F630368D1EE00C91783 /* gaemobileanalytics_Prefix.pch */;
+		name = "gaemobileanalytics_Prefix.pch: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 205;
+		vrLoc = 0;
+	};
+	F8A710E212B9AFE300E16B82 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = 29B97316FDCFA39411CA2CEA /* main.m */;
+	};
+	F8A710E312B9AFE300E16B82 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 29B97316FDCFA39411CA2CEA /* main.m */;
+		name = "main.m: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 360;
+		vrLoc = 0;
+	};
+}
