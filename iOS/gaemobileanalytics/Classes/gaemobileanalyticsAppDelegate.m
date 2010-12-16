@@ -32,6 +32,7 @@
  */
 
 #import "gaemobileanalyticsAppDelegate.h"
+#import "GAEMobileAnalytics.h"
 
 @implementation gaemobileanalyticsAppDelegate
 
@@ -45,6 +46,19 @@
     
     // Override point for customization after application launch.
     
+	[[GAEMobileAnalytics defaultLogger] initWithApiKey:@"put-a-few-random-characters-here" baseUrl:@"http://localhost:8081/log" eventsUrl:@"http://localhost:8081/log/event"];
+	
+	
+	NSMutableDictionary *parameters2 = [NSMutableDictionary dictionary];
+	[parameters2 setObject:@"B" forKey:@"title"];
+	[parameters2 setObject:@"a" forKey:@"subtitle"];
+	[[GAEMobileAnalytics defaultLogger] logEvent:@"TEST" parameters:parameters2 discreet:YES];
+	
+	NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+	[parameters setObject:[NSNumber numberWithFloat:1000000.9] forKey:@"subtitle"];
+	[parameters setObject:[NSNumber numberWithFloat:102.12] forKey:@"title"];
+	[[GAEMobileAnalytics defaultLogger] logEvent:@"TEST" parameters:parameters discreet:NO];
+	
     [self.window makeKeyAndVisible];
     
     return YES;

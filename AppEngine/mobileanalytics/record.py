@@ -37,6 +37,7 @@ from datastore import DailyNewUsers
 from datastore import DailySessions
 from datastore import DailyUniqueUsersSession
 from datastore import Events
+from datastore import NonDiscreetEvents
 from google.appengine.ext import db
 from django.utils import simplejson
 import datetime
@@ -570,15 +571,21 @@ class RecordAnalytics(object):
 			record.total = record.total + 1
 			record.put()
 		if count==0:
-			event = Events()
-			event.total = 1
-			event.event_name = event_name
-			event.param_key = param_key
-			event.param_value = param_value
-			event.os = self.os
-			event.os_ver = self.os_ver
-			event.app_ver = self.app_ver
-			event.put()
+			if is_discreet:
+				event = Events()
+			else:
+				event = NonDiscreetEvents()
+			try:
+				event.total = 1
+				event.event_name = event_name
+				event.param_key = param_key
+				event.param_value = param_value
+				event.os = self.os
+				event.os_ver = self.os_ver
+				event.app_ver = self.app_ver
+				event.put()
+			except:
+				pass
 	
 	def recordEvent(self, event_name, parameters, is_discreet, duration=None):
 		

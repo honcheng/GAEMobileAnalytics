@@ -585,3 +585,6 @@ AppEngine/pytz/zoneinfo/iso3166.tab
 AppEngine/pytz/zoneinfo/localtime
 AppEngine/pytz/zoneinfo/posixrules
 AppEngine/pytz/zoneinfo/zone.tab
+/AppEngine/mobileanalytics/config.pyc
+/AppEngine/mobileanalytics/datastore.pyc
+/AppEngine/mobileanalytics/record.pyc

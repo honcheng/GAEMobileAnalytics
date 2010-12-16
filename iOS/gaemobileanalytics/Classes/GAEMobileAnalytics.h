@@ -35,9 +35,17 @@
 
 
 @interface GAEMobileAnalytics : NSObject {
-
+	NSString *apiKey, *secretKey;
+	int startTime;
+	NSString *basicAnalyticsRecordUrl, *eventsAnalyticsRecordUrl;
 }
 
-+ (void)logEvent:(NSString*)eventName parameters:(NSDictionary*)parameters;
++ (GAEMobileAnalytics *)defaultLogger;
+
+@property (nonatomic, retain) NSString *apiKey, *secretKey;
+@property (nonatomic, retain) NSString *basicAnalyticsRecordUrl, *eventsAnalyticsRecordUrl;
+
+- (id)initWithApiKey:(NSString*)_apiKey baseUrl:(NSString*)basicUrl eventsUrl:(NSString*)eventsUrl;
+- (void)logEvent:(NSString*)eventName parameters:(NSMutableDictionary*)parameters discreet:(BOOL)discreet;
 
 @end
