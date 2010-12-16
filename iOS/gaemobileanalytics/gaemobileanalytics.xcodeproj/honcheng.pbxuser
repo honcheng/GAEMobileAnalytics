@@ -9,8 +9,8 @@
 	};
 	1D3623250D0F684500981E51 /* gaemobileanalyticsAppDelegate.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1965, 1521}}";
-			sepNavSelRange = "{1484, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {1965, 1417}}";
+			sepNavSelRange = "{1678, 171}";
 			sepNavVisRange = "{871, 2214}";
 		};
 	};
@@ -54,10 +54,11 @@
 					PBXFileDataSource_Target_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 314161260;
-			PBXWorkspaceStateSaveDate = 314161260;
+			PBXPerProjectTemplateStateSaveDate = 314174704;
+			PBXWorkspaceStateSaveDate = 314174704;
 		};
 		perUserProjectItems = {
+			F809C77412B9ECFB0094F397 /* PBXTextBookmark */ = F809C77412B9ECFB0094F397 /* PBXTextBookmark */;
 			F8A710C612B9AF8C00E16B82 /* PBXTextBookmark */ = F8A710C612B9AF8C00E16B82 /* PBXTextBookmark */;
 			F8D594E512B9D31000612254 /* PBXTextBookmark */ = F8D594E512B9D31000612254 /* PBXTextBookmark */;
 			F8D594E612B9D31000612254 /* PlistBookmark */ = F8D594E612B9D31000612254 /* PlistBookmark */;
@@ -65,7 +66,6 @@
 			F8D5950212B9D3A800612254 /* PBXTextBookmark */ = F8D5950212B9D3A800612254 /* PBXTextBookmark */;
 			F8D5950D12B9D3E200612254 /* PBXTextBookmark */ = F8D5950D12B9D3E200612254 /* PBXTextBookmark */;
 			F8D5954112B9DA9100612254 /* PBXTextBookmark */ = F8D5954112B9DA9100612254 /* PBXTextBookmark */;
-			F8D5954212B9DA9100612254 /* PBXTextBookmark */ = F8D5954212B9DA9100612254 /* PBXTextBookmark */;
 			F8D5959212B9DF0500612254 /* PBXTextBookmark */ = F8D5959212B9DF0500612254 /* PBXTextBookmark */;
 		};
 		sourceControlManager = F8A710BE12B9AE3C00E16B82 /* Source Control */;
@@ -85,6 +85,16 @@
 			sepNavSelRange = "{0, 0}";
 			sepNavVisRange = "{0, 205}";
 		};
+	};
+	F809C77412B9ECFB0094F397 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 1D3623250D0F684500981E51 /* gaemobileanalyticsAppDelegate.m */;
+		name = "gaemobileanalyticsAppDelegate.m: 49";
+		rLen = 171;
+		rLoc = 1678;
+		rType = 0;
+		vrLen = 2214;
+		vrLoc = 871;
 	};
 	F8A710AF12B9AE3900E16B82 /* gaemobileanalytics */ = {
 		isa = PBXExecutable;
@@ -178,7 +188,7 @@
 		);
 		name = "/Users/honcheng/Dropbox/AppEngine/gaemobileanalytics/iOS/gaemobileanalytics/gaemobileanalytics-Info.plist";
 		rLen = 0;
-		rLoc = 9223372036854775807;
+		rLoc = 9223372036854775808;
 	};
 	F8D594E712B9D31000612254 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
@@ -219,16 +229,6 @@
 		rType = 0;
 		vrLen = 1418;
 		vrLoc = 2342;
-	};
-	F8D5954212B9DA9100612254 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 1D3623250D0F684500981E51 /* gaemobileanalyticsAppDelegate.m */;
-		name = "gaemobileanalyticsAppDelegate.m: 51";
-		rLen = 0;
-		rLoc = 1852;
-		rType = 0;
-		vrLen = 2129;
-		vrLoc = 962;
 	};
 	F8D5959212B9DF0500612254 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;

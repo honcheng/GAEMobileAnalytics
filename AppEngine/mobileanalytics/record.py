@@ -563,7 +563,7 @@ class RecordAnalytics(object):
 		if is_discreet:
 			records = db.GqlQuery("SELECT * FROM Events WHERE date=DATETIME(:year, :month, :day, 0, 0, 0) AND os=:os AND os_ver=:os_ver AND param_key=:param_key AND param_value=:param_value AND app_ver=:app_ver AND event_name=:event_name", year=today.year, month=today.month, day=today.day, os=self.os, os_ver=self.os_ver, param_key=param_key, param_value=param_value, app_ver=self.app_ver, event_name=event_name)
 		else:
-			records = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE date=DATETIME(:year, :month, :day, 0, 0, 0) AND os=:os AND os_ver=:os_ver AND param_key=:param_key AND param_value=:param_value AND app_ver=:app_ver AND event_name=:event_name", year=today.year, month=today.month, day=today.day, os=self.os, os_ver=self.os_ver, param_key=param_key, param_value=param_value, app_ver=self.app_ver, event_name=event_name)
+			records = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE date=DATETIME(:year, :month, :day, 0, 0, 0) AND os=:os AND os_ver=:os_ver AND param_key=:param_key AND param_value=:param_value AND app_ver=:app_ver AND event_name=:event_name", year=today.year, month=today.month, day=today.day, os=self.os, os_ver=self.os_ver, param_key=param_key, param_value=float(param_value), app_ver=self.app_ver, event_name=event_name)
 		count = 0
 		
 		for record in records:
@@ -571,15 +571,16 @@ class RecordAnalytics(object):
 			record.total = record.total + 1
 			record.put()
 		if count==0:
-			if is_discreet:
-				event = Events()
-			else:
-				event = NonDiscreetEvents()
 			try:
+				if is_discreet:
+					event = StalkerEvents()
+					event.param_value = param_value
+				else:
+					event = StalkerNonDiscreetEvents()
+					event.param_value = float(param_value)
 				event.total = 1
 				event.event_name = event_name
 				event.param_key = param_key
-				event.param_value = param_value
 				event.os = self.os
 				event.os_ver = self.os_ver
 				event.app_ver = self.app_ver
