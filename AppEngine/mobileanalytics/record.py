@@ -557,11 +557,14 @@ class RecordAnalytics(object):
 			
 			self.incrementDailyNewUser()
 
-	def recordSingleEvent(self, event_name, param_key, param_value, duration=None):
+	def recordSingleEvent(self, event_name, param_key, param_value, is_discreet,duration=None):
 		today = datetime.date.today()
-		records = db.GqlQuery("SELECT * FROM Events WHERE date=DATETIME(:year, :month, :day, 0, 0, 0) AND os=:os AND os_ver=:os_ver AND param_key=:param_key AND param_value=:param_value AND app_ver=:app_ver AND event_name=:event_name", year=today.year, month=today.month, day=today.day, os=self.os, os_ver=self.os_ver, param_key=param_key, param_value=param_value, app_ver=self.app_ver, event_name=event_name)
+		if is_discreet:
+			records = db.GqlQuery("SELECT * FROM Events WHERE date=DATETIME(:year, :month, :day, 0, 0, 0) AND os=:os AND os_ver=:os_ver AND param_key=:param_key AND param_value=:param_value AND app_ver=:app_ver AND event_name=:event_name", year=today.year, month=today.month, day=today.day, os=self.os, os_ver=self.os_ver, param_key=param_key, param_value=param_value, app_ver=self.app_ver, event_name=event_name)
+		else:
+			records = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE date=DATETIME(:year, :month, :day, 0, 0, 0) AND os=:os AND os_ver=:os_ver AND param_key=:param_key AND param_value=:param_value AND app_ver=:app_ver AND event_name=:event_name", year=today.year, month=today.month, day=today.day, os=self.os, os_ver=self.os_ver, param_key=param_key, param_value=param_value, app_ver=self.app_ver, event_name=event_name)
 		count = 0
-		#print "%s %s " % (param_key, param_value)
+		
 		for record in records:
 			count += 1
 			record.total = record.total + 1
@@ -577,13 +580,13 @@ class RecordAnalytics(object):
 			event.app_ver = self.app_ver
 			event.put()
 	
-	def recordEvent(self, event_name, parameters, duration=None):
+	def recordEvent(self, event_name, parameters, is_discreet, duration=None):
 		
 		for key in parameters:
 			if duration==None:
-				self.recordSingleEvent(event_name, key, parameters[key])
+				self.recordSingleEvent(event_name, key, parameters[key], is_discreet)
 			else:
-				self.recordSingleEvent(event_name, key, parameters[key], duration=duration)
+				self.recordSingleEvent(event_name, key, parameters[key], is_discreet, duration=duration)
 
 	def recordAccess(self):
 		records = db.GqlQuery("SELECT * FROM DailyMobileDeviceAccess WHERE device_id='%s'" % self.device_id)

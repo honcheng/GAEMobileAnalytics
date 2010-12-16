@@ -31,12 +31,12 @@
 #  
 #
 
-from mobileanalytics.datastore import MobileDevice
-from mobileanalytics.datastore import DailyMobileDeviceAccess
-from mobileanalytics.datastore import DailyNewUsers
-from mobileanalytics.datastore import DailySessions
-from mobileanalytics.datastore import DailyUniqueUsersSession
-from mobileanalytics.datastore import Events
-from mobileanalytics.record import RecordAnalytics
-from mobileanalytics.record import DisplayAnalytics
+from datastore import MobileDevice
+from datastore import DailyMobileDeviceAccess
+from datastore import DailyNewUsers
+from datastore import DailySessions
+from datastore import DailyUniqueUsersSession
+from datastore import Events
+from record import RecordAnalytics
+from record import DisplayAnalytics
 import config

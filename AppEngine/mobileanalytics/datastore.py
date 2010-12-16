@@ -97,7 +97,7 @@ class AccessFrequency(db.Model):
 	os_ver = db.StringProperty()
 	app_ver = db.StringProperty()
 
-# no dependency on other table
+# no dependency on other tables
 # developer specify the event name, and the key-value pair associated with this
 # there can be multiple key-value pairs for one event, and they can be sent in clusters and by itself
 # clustered events are recorded separately without saving the relationship between different key-value of the same event name
@@ -113,6 +113,25 @@ class Events(db.Model):
 	os_ver = db.StringProperty()
 	app_ver = db.StringProperty()
 	duration = db.IntegerProperty()
+	
+# no dependency on other tables
+# developer specify the event name, and the key-value pair associated with this
+# there can be multiple key-value pairs for one event, and they can be sent in clusters and by itself
+# clustered events are recorded separately without saving the relationship between different key-value of the same event name
+# it is up to developer to specify relevant key-value pairs if they want to find relationship between different key-value in the same event
+# average duration of event is saved in seconds, if required.
+# similar to Events table, but record param_value as float, and present data in a different graph
+class NonDiscreetEvents(db.Model):
+	event_name = db.StringProperty()
+	param_key = db.StringProperty()
+	param_value = db.FloatProperty()
+	total = db.IntegerProperty()
+	date = db.DateProperty(auto_now_add=True)
+	os = db.StringProperty()
+	os_ver = db.StringProperty()
+	app_ver = db.StringProperty()
+	duration = db.IntegerProperty()
+	
 	
 
 		

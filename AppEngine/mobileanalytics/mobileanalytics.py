@@ -106,7 +106,7 @@ class RecordAnalytics(webapp.RequestHandler):
 			if analytics.allowLogging:
 				taskqueue.add(url=mobileanalytics.config.record_queue_path, params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'device_model':device_model, 'manufacturer':manufacturer, 'telco':telco, 't':t, 's':s})	
 
-class QueueRecordAnalyticsEvent(webapp.RequestHandler):
+class QueueRecordAnalyticsDiscreetEvent(webapp.RequestHandler):
 	def post(self):
 		device_id = self.request.get("device_id")
 		os = self.request.get("os")
@@ -119,7 +119,7 @@ class QueueRecordAnalyticsEvent(webapp.RequestHandler):
 		obj = simplejson.loads(parameters)
 		
 		analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
-		analytics.recordEvent(event, obj)
+		analytics.recordEvent(event, obj, 1)
 
 class GetAnalyticsChartForEvents(webapp.RequestHandler):
 	def get(self):
@@ -144,7 +144,7 @@ class GetAnalyticsChartForEvents(webapp.RequestHandler):
 			data = display.showEvents(width=width, height=height)
 			self.response.out.write(data)
 
-class RecordAnalyticsEvent(webapp.RequestHandler):
+class RecordAnalyticsDiscreetEvent(webapp.RequestHandler):
 	def get(self):
 		pass
 		
@@ -161,7 +161,41 @@ class RecordAnalyticsEvent(webapp.RequestHandler):
 			
 			analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
 			if analytics.allowLogging:
-				taskqueue.add(url=mobileanalytics.config.record_event_queue_path, params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'event':event, 'parameters':parameters, 't':t, 's':s})
+				taskqueue.add(url=mobileanalytics.config.record_discreetevent_queue_path, params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'event':event, 'parameters':parameters, 't':t, 's':s})
+
+class RecordAnalyticsNonDiscreetEvent(webapp.RequestHandler):
+	def get(self):
+		pass
+		
+	def post(self):
+		device_id = self.request.get("device_id")
+		if device_id:
+			os = self.request.get("os")
+			os_ver = self.request.get("os_ver")
+			app_ver = self.request.get("app_ver")
+			event = self.request.get("event")
+			parameters = self.request.get("parameters")
+			t = self.request.get("t")
+			s = self.request.get("s")
+			
+			analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
+			if analytics.allowLogging:
+				taskqueue.add(url=mobileanalytics.config.record_nondiscreetevent_queue_path, params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'event':event, 'parameters':parameters, 't':t, 's':s})
+
+class QueueRecordAnalyticsNonDiscreetEvent(webapp.RequestHandler):
+	def post(self):
+		device_id = self.request.get("device_id")
+		os = self.request.get("os")
+		os_ver = self.request.get("os_ver")
+		app_ver = self.request.get("app_ver")
+		event = self.request.get("event")
+		parameters = self.request.get("parameters")
+		t = self.request.get("t")
+		s = self.request.get("s")
+		obj = simplejson.loads(parameters)
+		
+		analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
+		analytics.recordEvent(event, obj, 0)
 
 class GetAnalyticsChart(webapp.RequestHandler):
 	def get(self):
@@ -230,8 +264,10 @@ def main():
 											( mobileanalytics.config.chart_event_path, GetAnalyticsChartForEvents),
 											( mobileanalytics.config.record_path, RecordAnalytics),
 											( mobileanalytics.config.record_queue_path, QueueRecordAnalytics),
-											( mobileanalytics.config.record_event_path, RecordAnalyticsEvent),
-											( mobileanalytics.config.record_event_queue_path, QueueRecordAnalyticsEvent)
+											( mobileanalytics.config.record_discreetevent_path, RecordAnalyticsDiscreetEvent),
+											( mobileanalytics.config.record_discreetevent_queue_path, QueueRecordAnalyticsDiscreetEvent),
+											( mobileanalytics.config.record_nondiscreetevent_path, RecordAnalyticsNonDiscreetEvent),
+											( mobileanalytics.config.record_nondiscreetevent_queue_path, QueueRecordAnalyticsNonDiscreetEvent)
 											],
                                          debug=True)
     util.run_wsgi_app(application)
