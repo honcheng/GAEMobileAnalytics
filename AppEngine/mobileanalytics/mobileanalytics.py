@@ -121,6 +121,36 @@ class QueueRecordAnalyticsDiscreetEvent(webapp.RequestHandler):
 		analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
 		analytics.recordEvent(event, obj, 1)
 
+class GetAnalyticsChartForNonDiscreetEvents(webapp.RequestHandler):
+	def get(self):
+		display = mobileanalytics.DisplayAnalytics()
+		event_name = self.request.get("event_name")
+		param_key = self.request.get("param_key")
+		width = self.request.get("width")
+		height = self.request.get("height")
+		
+		if width=='':
+			width = None
+		if height=='':
+			height = None
+		if self.request.get("x_size")=='':
+			x_size = None
+		else:
+			x_size = float(self.request.get("x_size"))
+		if param_key=='':
+			param_key = None
+		if self.request.get("min_x")=='':
+			min_x = None
+		else:
+			min_x = float(self.request.get("min_x"))
+		if self.request.get("max_x")=='':
+			max_x = None
+		else:
+			max_x = float(self.request.get("max_x"))
+		
+		data = display.showNonDiscreetEvent(event_name, param_key, width, height, x_size, min_x, max_x)
+		self.response.out.write(data)
+
 class GetAnalyticsChartForEvents(webapp.RequestHandler):
 	def get(self):
 		display = mobileanalytics.DisplayAnalytics()
@@ -250,6 +280,7 @@ def main():
 											( mobileanalytics.config.display_path, DisplayAnalytics),
 											( mobileanalytics.config.chart_path, GetAnalyticsChart),
 											( mobileanalytics.config.chart_event_path, GetAnalyticsChartForEvents),
+											( mobileanalytics.config.chart_event_path + "/nondiscreet", GetAnalyticsChartForNonDiscreetEvents),
 											( mobileanalytics.config.record_path, RecordAnalytics),
 											( mobileanalytics.config.record_queue_path, QueueRecordAnalytics),
 											( mobileanalytics.config.record_event_path, RecordAnalyticsEvent),

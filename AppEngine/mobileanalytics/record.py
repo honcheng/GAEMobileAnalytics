@@ -209,6 +209,75 @@ class DisplayAnalytics(object):
 		
 		return chart_url
 	
+	def showNonDiscreetEvent(self, eventName, paramKey, width, height, xSize, minX, maxX):
+		
+		paramKeys = []
+		if paramKey!=None:
+			paramKeys = paramKey.split(',')
+		if len(paramKeys)>0:
+			paramKey = None
+		
+		if paramKey==None:
+			if minX==None and maxX==None:
+				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name ORDER BY param_value", event_name=eventName)
+			elif minX!=None and maxX!=None:
+				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_value>:min_x AND param_value<:max_x ORDER BY param_value", event_name=eventName, min_x=minX, max_x=maxX)
+			elif minX==None and maxX!=None:
+				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_value<:max_x ORDER BY param_value", event_name=eventName, max_x=maxX)
+			else:
+				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_value>:min_x ORDER BY param_value", event_name=eventName, min_x=minX)
+		else:
+			if minX==None and maxX==None:
+				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key ORDER BY param_value", event_name=eventName, param_key=paramKey)
+			elif minX!=None and maxX!=None:
+				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value>:min_x AND param_value<:max_x ORDER BY param_value", event_name=eventName, param_key=paramKey, min_x=minX, max_x=maxX)
+			elif minX==None and maxX!=None:
+				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value<:max_x ORDER BY param_value", event_name=eventName, param_key=paramKey, max_x=maxX)
+			else:
+				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value>:min_x ORDER BY param_value", event_name=eventName, param_key=paramKey, min_x=minX)
+			
+		if xSize == None:
+			xSize = 10
+		
+		all_x_values = []
+		for event in events:
+			if len(paramKeys)>0:
+				if event.param_key in paramKeys:
+					all_x_values.append(event.param_value)
+			else:
+				all_x_values.append(event.param_value)
+		if minX==None:
+			start_x = min(all_x_values)
+		else:
+			start_x = minX
+		lower_limit = start_x
+		upper_limit = lower_limit + xSize
+		chl_list = []
+		y_values = []
+		
+		for x_value in all_x_values:
+			if len(y_values)==0:
+				y_values.append(0)
+				mid_point = "%s" % (int((lower_limit+upper_limit)/2))
+				chl_list.append(mid_point)
+			
+			if x_value <= upper_limit:
+				y_values[-1] = y_values[-1] + 1
+			else:
+				y_values.append(1)
+				lower_limit += xSize
+				upper_limit += xSize
+			mid_point = "%s" % (int((lower_limit+upper_limit)/2))
+			if chl_list[-1]!=mid_point:
+				chl_list.append(mid_point)
+
+		if len(y_values)==0:
+			return "no data yet"
+	
+		chart_url = self.getLineChartURL(chl_list, y_values, width, height)
+		chart_data = "<img src='%s'/>" % chart_url
+		return chart_data
+	
 	def showEvents(self, eventName=None, paramKey=None, width=None, height=None):
 		"""
 		records = db.GqlQuery("SELECT * FROM Events ORDER BY event_name, param_key, date, param_value")
