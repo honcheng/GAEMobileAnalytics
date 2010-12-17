@@ -264,9 +264,17 @@ class DisplayAnalytics(object):
 			if x_value <= upper_limit:
 				y_values[-1] = y_values[-1] + 1
 			else:
-				y_values.append(1)
 				lower_limit += xSize
 				upper_limit += xSize
+				while x_value > upper_limit:
+					lower_limit += xSize
+					upper_limit += xSize
+					y_values.append(0)
+					mid_point = "%s" % (int((lower_limit+upper_limit)/2))
+					if chl_list[-1]!=mid_point:
+						chl_list.append(mid_point)
+				y_values.append(1)
+				
 			mid_point = "%s" % (int((lower_limit+upper_limit)/2))
 			if chl_list[-1]!=mid_point:
 				chl_list.append(mid_point)
