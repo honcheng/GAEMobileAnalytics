@@ -30,16 +30,16 @@ Logger.LogEvent(string eventName, Dictionary<string, object> parameters)
 	parameters.Add("title","twitter");  
 	parameters.Add("action", "share");  
 	Logger.LogEvent("BUTTON_CLICKED", parameters);  
-OR 
-	Dictionary<string, object> parameters = new Dictionary<string, object>();
-	parameters.Add("title","twitter");
-	parameters.Add("action", "view");
-	Logger.LogEvent("BUTTON_CLICKED", parameters);
-OR
-	Dictionary<string, object> parameters = new Dictionary<string, object>();
-	parameters.Add("title","facebook");
-	parameters.Add("action", "share");
-	Logger.LogEvent("BUTTON_CLICKED", parameters);
+	OR  
+	Dictionary<string, object> parameters = new Dictionary<string, object>();  
+	parameters.Add("title","twitter");  
+	parameters.Add("action", "view");  
+	Logger.LogEvent("BUTTON_CLICKED", parameters);  
+	OR  
+	Dictionary<string, object> parameters = new Dictionary<string, object>();  
+	parameters.Add("title","facebook");  
+	parameters.Add("action", "share");  
+	Logger.LogEvent("BUTTON_CLICKED", parameters);  
 
 * example : track failure of action by phone model
    Dictionary<string, object> parameters = new Dictionary<string, object>();
