@@ -11,7 +11,8 @@ to be added soon
 
 ## Instruction for Windows Phone 7
 
-Logger.OnApplicationStarted(É.)
+Logger.OnApplicationStarted(...)
+
 * call this everytime the app is started
 * this method gives the bare minimum analytics:
   * number of sessions daily
@@ -19,6 +20,7 @@ Logger.OnApplicationStarted(É.)
   * distribution of phone models
 
 Logger.LogEvent(string eventName, Dictionary<string, object> parameters)
+
 * call this method to log event
 * group similar events with the same eventName
 * you can track multiple parameters 
