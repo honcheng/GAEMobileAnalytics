@@ -26,10 +26,10 @@ Logger.LogEvent(string eventName, Dictionary<string, object> parameters)
 * you can track multiple parameters 
 * example : tracking facebook/twitter button with share/view option
 
-	Dictionary<string, object> parameters = new Dictionary<string, object>();
-	parameters.Add("title","twitter");
-	parameters.Add("action", "share");
-	Logger.LogEvent("BUTTON_CLICKED", parameters);
+	Dictionary<string, object> parameters = new Dictionary<string, object>();  
+	parameters.Add("title","twitter");  
+	parameters.Add("action", "share");  
+	Logger.LogEvent("BUTTON_CLICKED", parameters);  
 OR 
 	Dictionary<string, object> parameters = new Dictionary<string, object>();
 	parameters.Add("title","twitter");
