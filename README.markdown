@@ -7,9 +7,24 @@ There are 2 components available:
 A demo can be found [here](http://www.honcheng.com/2010/11/Open-Source-Analytics-App-on-AppEngine---GAEMobileAnalytics). 
 
 ## Instruction for iOS
-to be added soon
 
-## Instruction for Windows Phone 7
+A sample application is included in **iOS/gaemobileanalytics**.
+
+To integrate GAEMobileAnalytics into your iOS application:
+
+1. Drag **iOS/gaemobileanalytics/Classes/GAEMobileAnalytics.h** and **iOS/gaemobileanalytics/Classes/GAEMobileAnalytics.m** into your XCode project
+2. Add **#import "GAEMobileAnalytics.h"** to your AppDelegate
+3. In your **- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions** method, add  
+
+    [[GAEMobileAnalytics defaultLogger] initWithApiKey:<api_key> baseUrl:<record_path> eventsUrl:<record_event_path>];  
+	
+	replace <api_key> with **gaemobileanalytics_api_key** in config.py  
+	replace <record_path> with **hostname+record_path** in config.py .e.g http://myapp.appspot.com/log  
+	replace <record_event_path> with **hostname+record_path** in config.py .e.g http://myapp.appspot.com/log/event  
+
+4. Use **[[GAEMobileAnalytics defaultLogger] logEvent:<event_name> parameters:<parameters> discreet:<is_discreet?>]** to log events
+
+## Instruction for Windows Phone 7  
 
 Logger.OnApplicationStarted(...)
 
@@ -49,4 +64,9 @@ Logger.LogEvent(string eventName, Dictionary<string, object> parameters)
 ## Dependencies
 
 * pytz
+
+## About me
+
+I make apps for iPhone, iPad, Android, WP7 and Google App Engine. 
+[Follow me in Twitter](http://twitter.com/honcheng)
 
