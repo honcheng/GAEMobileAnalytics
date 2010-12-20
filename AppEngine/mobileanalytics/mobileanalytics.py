@@ -128,7 +128,10 @@ class GetAnalyticsChartForNonDiscreetEvents(webapp.RequestHandler):
 		param_key = self.request.get("param_key")
 		width = self.request.get("width")
 		height = self.request.get("height")
+		os_ver = self.request.get("os_ver")
 		
+		if os_ver=='':
+			os_ver = None
 		if width=='':
 			width = None
 		if height=='':
@@ -148,7 +151,7 @@ class GetAnalyticsChartForNonDiscreetEvents(webapp.RequestHandler):
 		else:
 			max_x = float(self.request.get("max_x"))
 		
-		data = display.showNonDiscreetEvent(event_name, param_key, width, height, x_size, min_x, max_x)
+		data = display.showNonDiscreetEvent(event_name, param_key, width, height, x_size, min_x, max_x, osVer=os_ver)
 		self.response.out.write(data)
 
 class GetAnalyticsChartForEvents(webapp.RequestHandler):

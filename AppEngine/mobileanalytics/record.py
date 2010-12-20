@@ -209,7 +209,7 @@ class DisplayAnalytics(object):
 		
 		return chart_url
 	
-	def showNonDiscreetEvent(self, eventName, paramKey, width, height, xSize, minX, maxX):
+	def showNonDiscreetEvent(self, eventName, paramKey, width, height, xSize, minX, maxX, osVer=None):
 		
 		paramKeys = []
 		if paramKey!=None:
@@ -217,6 +217,26 @@ class DisplayAnalytics(object):
 		if len(paramKeys)>0:
 			paramKey = None
 		
+		osVers = []
+		if osVer!=None:
+			osVers = osVer.split(',')
+		if len(osVers)>0:
+			osVer = None
+		
+		query = "SELECT * FROM StalkerNonDiscreetEvents WHERE event_name='%s' " % eventName
+		if paramKey:
+			query += "AND param_key='%s' " % param_key
+		if minX:
+			query += "AND param_value>%s " % minX
+		if maxX:
+			query += "AND param_value<%s " % maxX
+		if osVer:
+			query += "AND os_ver='%s' " % osVer
+			
+		query += "ORDER BY param_value"
+		events = db.GqlQuery(query)
+		 
+		"""
 		if paramKey==None:
 			if minX==None and maxX==None:
 				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name ORDER BY param_value", event_name=eventName)
@@ -235,17 +255,27 @@ class DisplayAnalytics(object):
 				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value<:max_x ORDER BY param_value", event_name=eventName, param_key=paramKey, max_x=maxX)
 			else:
 				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value>:min_x ORDER BY param_value", event_name=eventName, param_key=paramKey, min_x=minX)
-			
-		if xSize == None:
-			xSize = 10
+		"""	
 		
 		all_x_values = []
 		for event in events:
+			should_add = False
 			if len(paramKeys)>0:
 				if event.param_key in paramKeys:
-					all_x_values.append(event.param_value)
+					should_add = True
 			else:
-				all_x_values.append(event.param_value)
+				should_add = True
+			
+			if should_add:
+				should_add = False
+				if len(osVers)>0:
+					if event.os_ver in osVers:
+						should_add = True
+				else:
+					should_add = True
+				if should_add:
+					all_x_values.append(event.param_value)
+					
 		if minX==None:
 			start_x = min(all_x_values)
 		else:
