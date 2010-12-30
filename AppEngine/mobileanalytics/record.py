@@ -223,7 +223,7 @@ class DisplayAnalytics(object):
 		if len(osVers)>0:
 			osVer = None
 		
-		query = "SELECT * FROM StalkerNonDiscreetEvents WHERE event_name='%s' " % eventName
+		query = "SELECT * FROM NonDiscreetEvents WHERE event_name='%s' " % eventName
 		if paramKey:
 			query += "AND param_key='%s' " % param_key
 		if minX:
@@ -239,22 +239,22 @@ class DisplayAnalytics(object):
 		"""
 		if paramKey==None:
 			if minX==None and maxX==None:
-				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name ORDER BY param_value", event_name=eventName)
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name ORDER BY param_value", event_name=eventName)
 			elif minX!=None and maxX!=None:
-				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_value>:min_x AND param_value<:max_x ORDER BY param_value", event_name=eventName, min_x=minX, max_x=maxX)
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_value>:min_x AND param_value<:max_x ORDER BY param_value", event_name=eventName, min_x=minX, max_x=maxX)
 			elif minX==None and maxX!=None:
-				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_value<:max_x ORDER BY param_value", event_name=eventName, max_x=maxX)
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_value<:max_x ORDER BY param_value", event_name=eventName, max_x=maxX)
 			else:
-				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_value>:min_x ORDER BY param_value", event_name=eventName, min_x=minX)
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_value>:min_x ORDER BY param_value", event_name=eventName, min_x=minX)
 		else:
 			if minX==None and maxX==None:
-				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key ORDER BY param_value", event_name=eventName, param_key=paramKey)
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key ORDER BY param_value", event_name=eventName, param_key=paramKey)
 			elif minX!=None and maxX!=None:
-				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value>:min_x AND param_value<:max_x ORDER BY param_value", event_name=eventName, param_key=paramKey, min_x=minX, max_x=maxX)
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value>:min_x AND param_value<:max_x ORDER BY param_value", event_name=eventName, param_key=paramKey, min_x=minX, max_x=maxX)
 			elif minX==None and maxX!=None:
-				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value<:max_x ORDER BY param_value", event_name=eventName, param_key=paramKey, max_x=maxX)
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value<:max_x ORDER BY param_value", event_name=eventName, param_key=paramKey, max_x=maxX)
 			else:
-				events = db.GqlQuery("SELECT * FROM StalkerNonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value>:min_x ORDER BY param_value", event_name=eventName, param_key=paramKey, min_x=minX)
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value>:min_x ORDER BY param_value", event_name=eventName, param_key=paramKey, min_x=minX)
 		"""	
 		
 		all_x_values = []
@@ -680,10 +680,10 @@ class RecordAnalytics(object):
 		if count==0:
 			try:
 				if is_discreet:
-					event = StalkerEvents()
+					event = Events()
 					event.param_value = param_value
 				else:
-					event = StalkerNonDiscreetEvents()
+					event = NonDiscreetEvents()
 					event.param_value = float(param_value)
 				event.total = 1
 				event.event_name = event_name
