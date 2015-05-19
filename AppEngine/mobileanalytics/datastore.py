@@ -1,3 +1,36 @@
+#
+#  Copyright (c) 2010 Muh Hon Cheng
+#  Created by honcheng on 11/29/10.
+#  
+#  Permission is hereby granted, free of charge, to any person obtaining 
+#  a copy of this software and associated documentation files (the 
+#  "Software"), to deal in the Software without restriction, including 
+#  without limitation the rights to use, copy, modify, merge, publish, 
+#  distribute, sublicense, and/or sell copies of the Software, and to 
+#  permit persons to whom the Software is furnished to do so, subject 
+#  to the following conditions:
+#  
+#  The above copyright notice and this permission notice shall be 
+#  included in all copies or substantial portions of the Software.
+#  
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT 
+#  WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+#  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+#  PURPOSE AND NONINFRINGEMENT. IN NO EVENT 
+#  SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+#  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
+#  IN CONNECTION WITH THE SOFTWARE OR 
+#  THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#  
+#  @author 		Muh Hon Cheng <honcheng@gmail.com>
+#  @copyright	2010	Muh Hon Cheng
+#  @version     0.1
+#  
+#
+
 from google.appengine.ext import db
 
 #
@@ -64,7 +97,7 @@ class AccessFrequency(db.Model):
 	os_ver = db.StringProperty()
 	app_ver = db.StringProperty()
 
-# no dependency on other table
+# no dependency on other tables
 # developer specify the event name, and the key-value pair associated with this
 # there can be multiple key-value pairs for one event, and they can be sent in clusters and by itself
 # clustered events are recorded separately without saving the relationship between different key-value of the same event name
@@ -80,6 +113,25 @@ class Events(db.Model):
 	os_ver = db.StringProperty()
 	app_ver = db.StringProperty()
 	duration = db.IntegerProperty()
+	
+# no dependency on other tables
+# developer specify the event name, and the key-value pair associated with this
+# there can be multiple key-value pairs for one event, and they can be sent in clusters and by itself
+# clustered events are recorded separately without saving the relationship between different key-value of the same event name
+# it is up to developer to specify relevant key-value pairs if they want to find relationship between different key-value in the same event
+# average duration of event is saved in seconds, if required.
+# similar to Events table, but record param_value as float, and present data in a different graph
+class NonDiscreetEvents(db.Model):
+	event_name = db.StringProperty()
+	param_key = db.StringProperty()
+	param_value = db.FloatProperty()
+	total = db.IntegerProperty()
+	date = db.DateProperty(auto_now_add=True)
+	os = db.StringProperty()
+	os_ver = db.StringProperty()
+	app_ver = db.StringProperty()
+	duration = db.IntegerProperty()
+	
 	
 
 		

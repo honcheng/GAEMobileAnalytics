@@ -1,9 +1,43 @@
+#
+#  Copyright (c) 2010 Muh Hon Cheng
+#  Created by honcheng on 11/29/10.
+#  
+#  Permission is hereby granted, free of charge, to any person obtaining 
+#  a copy of this software and associated documentation files (the 
+#  "Software"), to deal in the Software without restriction, including 
+#  without limitation the rights to use, copy, modify, merge, publish, 
+#  distribute, sublicense, and/or sell copies of the Software, and to 
+#  permit persons to whom the Software is furnished to do so, subject 
+#  to the following conditions:
+#  
+#  The above copyright notice and this permission notice shall be 
+#  included in all copies or substantial portions of the Software.
+#  
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT 
+#  WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+#  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+#  PURPOSE AND NONINFRINGEMENT. IN NO EVENT 
+#  SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+#  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
+#  IN CONNECTION WITH THE SOFTWARE OR 
+#  THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#  
+#  @author 		Muh Hon Cheng <honcheng@gmail.com>
+#  @copyright	2010	Muh Hon Cheng
+#  @version     0.1
+#  
+#
+
 from datastore import MobileDevice
 from datastore import DailyMobileDeviceAccess
 from datastore import DailyNewUsers
 from datastore import DailySessions
 from datastore import DailyUniqueUsersSession
 from datastore import Events
+from datastore import NonDiscreetEvents
 from google.appengine.ext import db
 from django.utils import simplejson
 import datetime
@@ -188,6 +222,113 @@ class DisplayAnalytics(object):
 				chart_url += "&%s=%s" % (key, other_parameters[key])
 		
 		return chart_url
+	
+	def showNonDiscreetEvent(self, eventName, paramKey, width, height, xSize, minX, maxX, osVer=None):
+		
+		paramKeys = []
+		if paramKey!=None:
+			paramKeys = paramKey.split(',')
+		if len(paramKeys)>0:
+			paramKey = None
+		
+		osVers = []
+		if osVer!=None:
+			osVers = osVer.split(',')
+		if len(osVers)>0:
+			osVer = None
+		
+		query = "SELECT * FROM NonDiscreetEvents WHERE event_name='%s' " % eventName
+		if paramKey:
+			query += "AND param_key='%s' " % param_key
+		if minX:
+			query += "AND param_value>%s " % minX
+		if maxX:
+			query += "AND param_value<%s " % maxX
+		if osVer:
+			query += "AND os_ver='%s' " % osVer
+			
+		query += "ORDER BY param_value"
+		events = db.GqlQuery(query)
+		 
+		"""
+		if paramKey==None:
+			if minX==None and maxX==None:
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name ORDER BY param_value", event_name=eventName)
+			elif minX!=None and maxX!=None:
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_value>:min_x AND param_value<:max_x ORDER BY param_value", event_name=eventName, min_x=minX, max_x=maxX)
+			elif minX==None and maxX!=None:
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_value<:max_x ORDER BY param_value", event_name=eventName, max_x=maxX)
+			else:
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_value>:min_x ORDER BY param_value", event_name=eventName, min_x=minX)
+		else:
+			if minX==None and maxX==None:
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key ORDER BY param_value", event_name=eventName, param_key=paramKey)
+			elif minX!=None and maxX!=None:
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value>:min_x AND param_value<:max_x ORDER BY param_value", event_name=eventName, param_key=paramKey, min_x=minX, max_x=maxX)
+			elif minX==None and maxX!=None:
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value<:max_x ORDER BY param_value", event_name=eventName, param_key=paramKey, max_x=maxX)
+			else:
+				events = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE event_name=:event_name AND param_key=:param_key AND param_value>:min_x ORDER BY param_value", event_name=eventName, param_key=paramKey, min_x=minX)
+		"""	
+		
+		all_x_values = []
+		for event in events:
+			should_add = False
+			if len(paramKeys)>0:
+				if event.param_key in paramKeys:
+					should_add = True
+			else:
+				should_add = True
+			
+			if should_add:
+				should_add = False
+				if len(osVers)>0:
+					if event.os_ver in osVers:
+						should_add = True
+				else:
+					should_add = True
+				if should_add:
+					all_x_values.append(event.param_value)
+					
+		if minX==None:
+			start_x = min(all_x_values)
+		else:
+			start_x = minX
+		lower_limit = start_x
+		upper_limit = lower_limit + xSize
+		chl_list = []
+		y_values = []
+		
+		for x_value in all_x_values:
+			if len(y_values)==0:
+				y_values.append(0)
+				mid_point = "%s" % (int((lower_limit+upper_limit)/2))
+				chl_list.append(mid_point)
+			
+			if x_value <= upper_limit:
+				y_values[-1] = y_values[-1] + 1
+			else:
+				lower_limit += xSize
+				upper_limit += xSize
+				while x_value > upper_limit:
+					lower_limit += xSize
+					upper_limit += xSize
+					y_values.append(0)
+					mid_point = "%s" % (int((lower_limit+upper_limit)/2))
+					if chl_list[-1]!=mid_point:
+						chl_list.append(mid_point)
+				y_values.append(1)
+				
+			mid_point = "%s" % (int((lower_limit+upper_limit)/2))
+			if chl_list[-1]!=mid_point:
+				chl_list.append(mid_point)
+
+		if len(y_values)==0:
+			return "no data yet"
+	
+		chart_url = self.getLineChartURL(chl_list, y_values, width, height)
+		chart_data = "<img src='%s'/>" % chart_url
+		return chart_data
 	
 	def showEvents(self, eventName=None, paramKey=None, width=None, height=None):
 		"""
@@ -538,33 +679,43 @@ class RecordAnalytics(object):
 			
 			self.incrementDailyNewUser()
 
-	def recordSingleEvent(self, event_name, param_key, param_value, duration=None):
+	def recordSingleEvent(self, event_name, param_key, param_value, is_discreet,duration=None):
 		today = datetime.date.today()
-		records = db.GqlQuery("SELECT * FROM Events WHERE date=DATETIME(:year, :month, :day, 0, 0, 0) AND os=:os AND os_ver=:os_ver AND param_key=:param_key AND param_value=:param_value AND app_ver=:app_ver AND event_name=:event_name", year=today.year, month=today.month, day=today.day, os=self.os, os_ver=self.os_ver, param_key=param_key, param_value=param_value, app_ver=self.app_ver, event_name=event_name)
+		if is_discreet:
+			records = db.GqlQuery("SELECT * FROM Events WHERE date=DATETIME(:year, :month, :day, 0, 0, 0) AND os=:os AND os_ver=:os_ver AND param_key=:param_key AND param_value=:param_value AND app_ver=:app_ver AND event_name=:event_name", year=today.year, month=today.month, day=today.day, os=self.os, os_ver=self.os_ver, param_key=param_key, param_value=param_value, app_ver=self.app_ver, event_name=event_name)
+		else:
+			records = db.GqlQuery("SELECT * FROM NonDiscreetEvents WHERE date=DATETIME(:year, :month, :day, 0, 0, 0) AND os=:os AND os_ver=:os_ver AND param_key=:param_key AND param_value=:param_value AND app_ver=:app_ver AND event_name=:event_name", year=today.year, month=today.month, day=today.day, os=self.os, os_ver=self.os_ver, param_key=param_key, param_value=float(param_value), app_ver=self.app_ver, event_name=event_name)
 		count = 0
-		#print "%s %s " % (param_key, param_value)
+		
 		for record in records:
 			count += 1
 			record.total = record.total + 1
 			record.put()
 		if count==0:
-			event = Events()
-			event.total = 1
-			event.event_name = event_name
-			event.param_key = param_key
-			event.param_value = param_value
-			event.os = self.os
-			event.os_ver = self.os_ver
-			event.app_ver = self.app_ver
-			event.put()
+			try:
+				if is_discreet:
+					event = Events()
+					event.param_value = param_value
+				else:
+					event = NonDiscreetEvents()
+					event.param_value = float(param_value)
+				event.total = 1
+				event.event_name = event_name
+				event.param_key = param_key
+				event.os = self.os
+				event.os_ver = self.os_ver
+				event.app_ver = self.app_ver
+				event.put()
+			except:
+				pass
 	
-	def recordEvent(self, event_name, parameters, duration=None):
+	def recordEvent(self, event_name, parameters, is_discreet, duration=None):
 		
 		for key in parameters:
 			if duration==None:
-				self.recordSingleEvent(event_name, key, parameters[key])
+				self.recordSingleEvent(event_name, key, parameters[key], is_discreet)
 			else:
-				self.recordSingleEvent(event_name, key, parameters[key], duration=duration)
+				self.recordSingleEvent(event_name, key, parameters[key], is_discreet, duration=duration)
 
 	def recordAccess(self):
 		records = db.GqlQuery("SELECT * FROM DailyMobileDeviceAccess WHERE device_id='%s'" % self.device_id)
@@ -616,5 +767,4 @@ class RecordAnalytics(object):
 		else:
 			actual_secret_key = self.getSecretKey(config.gaemobileanalytics_api_key, self.time)
 			return actual_secret_key==self.secret_key
-		
 		

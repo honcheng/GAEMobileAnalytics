@@ -10,7 +10,7 @@ handlers:
   login: admin  
 
 - url: .*
-  script: main.py
+  script: mobileanalytics/mobileanalytics.py
  
 builtins:
 - remote_api: on

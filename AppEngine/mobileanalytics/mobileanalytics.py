@@ -1,19 +1,36 @@
-#!/usr/bin/env python
 #
-# Copyright 2007 Google Inc.
+#  Copyright (c) 2010 Muh Hon Cheng
+#  Created by honcheng on 11/29/10.
+#  
+#  Permission is hereby granted, free of charge, to any person obtaining 
+#  a copy of this software and associated documentation files (the 
+#  "Software"), to deal in the Software without restriction, including 
+#  without limitation the rights to use, copy, modify, merge, publish, 
+#  distribute, sublicense, and/or sell copies of the Software, and to 
+#  permit persons to whom the Software is furnished to do so, subject 
+#  to the following conditions:
+#  
+#  The above copyright notice and this permission notice shall be 
+#  included in all copies or substantial portions of the Software.
+#  
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT 
+#  WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+#  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+#  PURPOSE AND NONINFRINGEMENT. IN NO EVENT 
+#  SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+#  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
+#  IN CONNECTION WITH THE SOFTWARE OR 
+#  THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#  
+#  @author 		Muh Hon Cheng <honcheng@gmail.com>
+#  @copyright	2010	Muh Hon Cheng
+#  @version     0.1
+#  
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 import mobileanalytics
@@ -95,7 +112,7 @@ class RecordAnalytics(webapp.RequestHandler):
 			if analytics.allowLogging:
 				taskqueue.add(url=mobileanalytics.config.record_queue_path, params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'device_model':device_model, 'manufacturer':manufacturer, 'telco':telco, 't':t, 's':s})	
 
-class QueueRecordAnalyticsEvent(webapp.RequestHandler):
+class QueueRecordAnalyticsDiscreetEvent(webapp.RequestHandler):
 	def post(self):
 		device_id = self.request.get("device_id")
 		os = self.request.get("os")
@@ -108,7 +125,40 @@ class QueueRecordAnalyticsEvent(webapp.RequestHandler):
 		obj = simplejson.loads(parameters)
 		
 		analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
-		analytics.recordEvent(event, obj)
+		analytics.recordEvent(event, obj, 1)
+
+class GetAnalyticsChartForNonDiscreetEvents(webapp.RequestHandler):
+	def get(self):
+		display = mobileanalytics.DisplayAnalytics()
+		event_name = self.request.get("event_name")
+		param_key = self.request.get("param_key")
+		width = self.request.get("width")
+		height = self.request.get("height")
+		os_ver = self.request.get("os_ver")
+		
+		if os_ver=='':
+			os_ver = None
+		if width=='':
+			width = None
+		if height=='':
+			height = None
+		if self.request.get("x_size")=='':
+			x_size = None
+		else:
+			x_size = float(self.request.get("x_size"))
+		if param_key=='':
+			param_key = None
+		if self.request.get("min_x")=='':
+			min_x = None
+		else:
+			min_x = float(self.request.get("min_x"))
+		if self.request.get("max_x")=='':
+			max_x = None
+		else:
+			max_x = float(self.request.get("max_x"))
+		
+		data = display.showNonDiscreetEvent(event_name, param_key, width, height, x_size, min_x, max_x, osVer=os_ver)
+		self.response.out.write(data)
 
 class GetAnalyticsChartForEvents(webapp.RequestHandler):
 	def get(self):
@@ -139,20 +189,41 @@ class RecordAnalyticsEvent(webapp.RequestHandler):
 		
 	def post(self):
 		pass 
-		#do not record events
-		#device_id = self.request.get("device_id")
-		#if device_id:
-		#	os = self.request.get("os")
-		#	os_ver = self.request.get("os_ver")
-		#	app_ver = self.request.get("app_ver")
-		#	event = self.request.get("event")
-		#	parameters = self.request.get("parameters")
-		#	t = self.request.get("t")
-		#	s = self.request.get("s")
-		#	
-		#	analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
-		#	if analytics.allowLogging:
-		#		taskqueue.add(url=mobileanalytics.config.record_event_queue_path, params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'event':event, 'parameters':parameters, 't':t, 's':s})
+		# device_id = self.request.get("device_id")
+#         if device_id:
+#             os = self.request.get("os")
+#             os_ver = self.request.get("os_ver")
+#             app_ver = self.request.get("app_ver")
+#             event = self.request.get("event")
+#             parameters = self.request.get("parameters")
+#             t = self.request.get("t")
+#             s = self.request.get("s")
+#             if self.request.get("is_discreet")=='':
+#                 is_discreet = 1
+#             else:
+#                 is_discreet = int(self.request.get("is_discreet"))
+#
+#             analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
+#             if analytics.allowLogging:
+#                 if is_discreet:
+#                     taskqueue.add(url=mobileanalytics.config.record_event_queue_path, params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'event':event, 'parameters':parameters, 't':t, 's':s})
+#                 else:
+#                     taskqueue.add(url=mobileanalytics.config.record_event_queue_path + "/nondiscreet", params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'event':event, 'parameters':parameters, 't':t, 's':s})
+					
+class QueueRecordAnalyticsNonDiscreetEvent(webapp.RequestHandler):
+	def post(self):
+		device_id = self.request.get("device_id")
+		os = self.request.get("os")
+		os_ver = self.request.get("os_ver")
+		app_ver = self.request.get("app_ver")
+		event = self.request.get("event")
+		parameters = self.request.get("parameters")
+		t = self.request.get("t")
+		s = self.request.get("s")
+		obj = simplejson.loads(parameters)
+		
+		analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
+		analytics.recordEvent(event, obj, 0)
 
 class GetAnalyticsChart(webapp.RequestHandler):
 	def get(self):
@@ -220,10 +291,12 @@ def main():
 											( mobileanalytics.config.display_path, DisplayAnalytics),
 											( mobileanalytics.config.chart_path, GetAnalyticsChart),
 											( mobileanalytics.config.chart_event_path, GetAnalyticsChartForEvents),
+											( mobileanalytics.config.chart_event_path + "/nondiscreet", GetAnalyticsChartForNonDiscreetEvents),
 											( mobileanalytics.config.record_path, RecordAnalytics),
 											( mobileanalytics.config.record_queue_path, QueueRecordAnalytics),
 											( mobileanalytics.config.record_event_path, RecordAnalyticsEvent),
-											( mobileanalytics.config.record_event_queue_path, QueueRecordAnalyticsEvent)
+											( mobileanalytics.config.record_event_queue_path, QueueRecordAnalyticsDiscreetEvent),
+											( mobileanalytics.config.record_event_queue_path + "/nondiscreet", QueueRecordAnalyticsNonDiscreetEvent)
 											],
                                          debug=True)
     util.run_wsgi_app(application)
