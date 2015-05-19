@@ -20,6 +20,12 @@ import mobileanalytics
 from django.utils import simplejson
 from google.appengine.api.labs import taskqueue
 
+class ClearEvents(webapp.RequestHandler):
+	def get(self):
+		display = mobileanalytics.DisplayAnalytics()
+		count = display.clearEventsDatabase()
+		self.response.out.write("<b>total events</b>: %s" % count)
+
 class MainHandler(webapp.RequestHandler):
     def get(self):
         self.response.out.write('Hello world!')
@@ -132,19 +138,21 @@ class RecordAnalyticsEvent(webapp.RequestHandler):
 		pass
 		
 	def post(self):
-		device_id = self.request.get("device_id")
-		if device_id:
-			os = self.request.get("os")
-			os_ver = self.request.get("os_ver")
-			app_ver = self.request.get("app_ver")
-			event = self.request.get("event")
-			parameters = self.request.get("parameters")
-			t = self.request.get("t")
-			s = self.request.get("s")
-			
-			analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
-			if analytics.allowLogging:
-				taskqueue.add(url=mobileanalytics.config.record_event_queue_path, params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'event':event, 'parameters':parameters, 't':t, 's':s})
+		pass 
+		#do not record events
+		#device_id = self.request.get("device_id")
+		#if device_id:
+		#	os = self.request.get("os")
+		#	os_ver = self.request.get("os_ver")
+		#	app_ver = self.request.get("app_ver")
+		#	event = self.request.get("event")
+		#	parameters = self.request.get("parameters")
+		#	t = self.request.get("t")
+		#	s = self.request.get("s")
+		#	
+		#	analytics = mobileanalytics.RecordAnalytics(device_id, os, os_ver, app_ver, time=t, secret_key=s)
+		#	if analytics.allowLogging:
+		#		taskqueue.add(url=mobileanalytics.config.record_event_queue_path, params={'device_id': device_id, 'os':os, 'os_ver':os_ver, 'app_ver':app_ver, 'event':event, 'parameters':parameters, 't':t, 's':s})
 
 class GetAnalyticsChart(webapp.RequestHandler):
 	def get(self):
@@ -188,9 +196,9 @@ class DisplayAnalytics(webapp.RequestHandler):
 		chart_content = ""
 		display = mobileanalytics.DisplayAnalytics()
 		if data=='' or data=='new_users':
-			chart_content = display.showDailySessions()
-		elif data=='sessions':
 			chart_content = display.showDailyNewUsers()
+		elif data=='sessions':
+			chart_content = display.showDailySessions()
 		elif data=='devices':
 			chart_content = display.showDeviceModelDistribution()
 		elif data=='events':
@@ -208,6 +216,7 @@ class RunTest(webapp.RequestHandler):
 
 def main():
     application = webapp.WSGIApplication([('/', MainHandler),
+											( '/admin/clear_events', ClearEvents),
 											( mobileanalytics.config.display_path, DisplayAnalytics),
 											( mobileanalytics.config.chart_path, GetAnalyticsChart),
 											( mobileanalytics.config.chart_event_path, GetAnalyticsChartForEvents),

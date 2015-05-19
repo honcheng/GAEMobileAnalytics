@@ -1,8 +1,16 @@
-application: gaemobileanalytics
-version: 118
+application: sgbusesanalytics
+version: 153
 runtime: python
 api_version: 1
 
 handlers:
+
+- url: /admin/clear_events
+  script: main.py  
+  login: admin  
+
 - url: .*
   script: main.py
+ 
+builtins:
+- remote_api: on
